@@ -5,7 +5,6 @@ from datetime import datetime
 
 CLIENT_RESULTS = []
 
-# get weighted average of each tenant's metrics based on dataset size
 def weighted_average(metrics):
     total = {'accuracy': 0.0, 'precision': 0.0, 'recall': 0.0, 'f1': 0.0}
     total_examples = 0
@@ -23,23 +22,20 @@ class Strategy(fl.server.strategy.FedAvg):
         super().__init__(**kwargs)
         self.final_weights = None
 
-    # FedAvg aggregation and communication overhead measurement
     def aggregate_fit(self, rnd, results, failures):
-        aggregated = super().aggregate_fit(rnd, results, failures)
-        if aggregated is not None:
-            parameters, _ = aggregated
-            self.final_weights = parameters
+        # pick model from client with most data
+        best_result = max(results, key=lambda x: x[1].num_examples)
+        parameters = best_result[1].parameters
+        self.final_weights = parameters
 
-            # measure communication overhead
-            total_bytes = sum(
-                sum(len(t) for t in result.parameters.tensors)
-                for _, result in results
-            )
-            print(f'Round {rnd} - Overhead: {total_bytes} bytes ({total_bytes/1024:.2f} KB)')
+        total_bytes = sum(
+            sum(len(t) for t in result.parameters.tensors)
+            for _, result in results
+        )
+        print(f'Round {rnd} - Overhead: {total_bytes} bytes ({total_bytes/1024:.2f} KB)')
 
-        return aggregated
+        return parameters, {}
 
-    # get the evaluation metrics from each client after every round
     def aggregate_evaluate(self, rnd, results, failures):
         for client, evaluate_res in results:
             metrics = evaluate_res.metrics
@@ -54,7 +50,6 @@ class Strategy(fl.server.strategy.FedAvg):
         return super().aggregate_evaluate(rnd, results, failures)
 
 
-# Tenants participation
 def main():
     strategy = Strategy(
         fraction_fit=1.0,
@@ -65,17 +60,11 @@ def main():
         evaluate_metrics_aggregation_fn=weighted_average,
     )
 
-    # start FL server
     fl.server.start_server(
         server_address='0.0.0.0:8081',
         config=fl.server.ServerConfig(num_rounds=5),
         strategy=strategy,
     )
-
-    if strategy.final_weights is not None:
-        ndarrays = fl.common.parameters_to_ndarrays(strategy.final_weights)
-        np.save('final_fl_weights.npy', np.array(ndarrays, dtype=object), allow_pickle=True)
-        print('Saved final FL weights to final_fl_weights.npy')
 
     df = pd.DataFrame(
         CLIENT_RESULTS,
@@ -85,22 +74,17 @@ def main():
     final_round = df['round'].max()
     final_df = df[df['round'] == final_round]
 
-    final_accuracy = final_df['accuracy'].mean()
-    final_precision = final_df['precision'].mean()
-    final_recall = final_df['recall'].mean()
-    final_f1 = final_df['f1'].mean()
-
     summary = pd.DataFrame([{
-        'Method': 'Proposed FL work',
-        'Accuracy': float(f'{final_accuracy:.6f}'),
-        'Precision': float(f'{final_precision:.6f}'),
-        'Recall': float(f'{final_recall:.6f}'),
-        'F1-Score': float(f'{final_f1:.6f}'),
+        'Method': 'Proposed FL XGBoost',
+        'Accuracy': float(f'{final_df["accuracy"].mean():.6f}'),
+        'Precision': float(f'{final_df["precision"].mean():.6f}'),
+        'Recall': float(f'{final_df["recall"].mean():.6f}'),
+        'F1-Score': float(f'{final_df["f1"].mean():.6f}'),
     }])
 
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    df.to_csv(f'fl_results_detailed_{timestamp}.csv', index=False)
-    summary.to_csv(f'fl_results_summary_{timestamp}.csv', index=False)
+    df.to_csv(f'fl_xgb_results_detailed_{timestamp}.csv', index=False)
+    summary.to_csv(f'fl_xgb_results_summary_{timestamp}.csv', index=False)
     print(summary.to_string(index=False))
 
 
