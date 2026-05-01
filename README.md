@@ -30,16 +30,6 @@ Dataset link: https://www.unb.ca/cic/datasets/ddos-2019.html
 | Tenant 2 (Medium) | MSSQL, NetBIOS, NTP | 30,950 |
 | Tenant 3 (Large) | UDP, SSDP, SNMP, UDPLag | 62,376 |
 
-## Key Results
-| Method | Dataset | Accuracy |
-|--------|---------|----------|
-| Centralized RF | CICDDoS2019 | 99.97% |
-| Centralized XGBoost | CICDDoS2019 | 99.98% |
-| FL Logistic Regression | CICDDoS2019 | 99.86% |
-| FL XGBoost | CICDDoS2019 | 99.94% |
-| FL-DAD (CNN) | CICIDS2017 | 98.70% |
-| FedLAD (XGBoost) | CICDDoS2019 | 98.38% |
-
 
 ## How to Run
 
