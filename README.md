@@ -9,7 +9,7 @@ This project implements a Federated Learning system for real-time DDoS detection
 │   └── DDoS_Detection_Analysis.ipynb   # Data processing, feature selection, baseline models, SHAP
 ├── federated_learning/
 │   ├── server.py                        # FL server with FedAvg aggregation
-│   ├── client.py                        # FL client with Logistic Regression
+│   ├── client.py                        # FL client
 │   ├── client_poisoned.py               # Poisoned client for security testing
 │   └── utils.py                         # Shared utility functions
 ├── requirements.txt                     # Required libraries
