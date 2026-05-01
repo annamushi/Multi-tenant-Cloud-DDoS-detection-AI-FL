@@ -1,15 +1,20 @@
 # FL DDoS Detection in Multi-Tenant Cloud Architectures
 
-## Overview
-This project implements a Federated Learning (FL) based system for real-time DDoS 
-detection in multi-tenant cloud environments. Instead of centralizing sensitive 
-network traffic data, each cloud tenant trains a local model on their own private 
-data and shares only model weights with a central server. This preserves data 
-privacy while enabling collaborative detection across all tenants.
+This project implements a Federated Learning system for real-time DDoS detection in multi-tenant cloud environments using the Flower framework. Each cloud tenant trains a local model on their own private data without sharing it, achieving 99.86% global accuracy while preserving data privacy.
 
-The system was evaluated using the CICDDoS2019 dataset and achieved 99.86% global 
-accuracy using Logistic Regression and 99.94% using XGBoost within the federated 
-learning framework.
+## Project Architecture
+
+```
+├── notebooks/
+│   └── DDoS_Detection_Analysis.ipynb   # Data processing, feature selection, baseline models, SHAP
+├── federated_learning/
+│   ├── server.py                        # FL server with FedAvg aggregation
+│   ├── client.py                        # FL client with Logistic Regression
+│   ├── client_poisoned.py               # Poisoned client for security testing
+│   └── utils.py                         # Shared utility functions
+├── requirements.txt                     # Required libraries
+└── README.md                            # Project documentation
+```
 
 ## Dataset
 This project uses the CICDDoS2019 dataset from the Canadian Institute for Cybersecurity.
