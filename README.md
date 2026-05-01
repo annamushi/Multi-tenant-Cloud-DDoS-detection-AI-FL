@@ -16,56 +16,51 @@ This project implements a Federated Learning system for real-time DDoS detection
 └── README.md                            # Project documentation
 ```
 
-## Dataset
-This project uses the CICDDoS2019 dataset from the Canadian Institute for Cybersecurity.
+## Key Features
 
-Nine attack types were used: DNS, LDAP, MSSQL, NetBIOS, NTP, SNMP, SSDP, UDP, UDPLag
+- **Federated Learning Implementation**: Using Flower (flwr) framework for distributed training across multiple tenants
+- **Privacy Preservation**: Raw data never leaves the tenant container at any point
+- **High Accuracy**: Achieved 99.86% global accuracy using Logistic Regression with FedAvg
+- **Non-IID Data Partitioning**: Each tenant holds a unique subset of DDoS attack types
+- **Scalability Testing**: Evaluated across 3, 4, and 5 tenant configurations
+- **Model Poisoning Robustness**: Tested against label flipping attacks
+- **Explainability**: Per-tenant SHAP analysis applied to understand feature importance
 
-Dataset link: https://www.unb.ca/cic/datasets/ddos-2019.html
+## Methodology
 
-## Tenant Configuration
+### Dataset
+The CICDDoS2019 dataset was used, containing labeled network traffic flows across multiple DDoS attack types including DNS, LDAP, MSSQL, NetBIOS, NTP, SNMP, SSDP, UDP, and UDPLag.
+
+### Data Partitioning
+
+- The combined balanced dataset (113,680 samples) was split into three non-IID tenant subsets
+- Each tenant was assigned unique attack types to simulate realistic multi-tenant traffic
+- Tenants vary in size representing small, medium, and large cloud customers
+
 | Tenant | Attack Types | Total Samples |
 |--------|-------------|---------------|
 | Tenant 1 (Small) | DNS, LDAP | 12,432 |
 | Tenant 2 (Medium) | MSSQL, NetBIOS, NTP | 30,950 |
 | Tenant 3 (Large) | UDP, SSDP, SNMP, UDPLag | 62,376 |
 
+### Federated Learning Process
 
-## How to Run
+1. **Feature Selection**: Top 15 features selected using Random Forest importance ranking
+2. **Local Training**: Each tenant trains a Logistic Regression model on its private data
+3. **Model Update**: Only model weights are sent to the Flower FL server
+4. **Aggregation**: Server combines weights using FedAvg algorithm
+5. **Global Model**: Updated model distributed back to all tenants
+6. **Iteration**: Process repeated for 5 rounds until convergence
 
+### Results
 
-### 1. Install dependencies
-```bash
-pip install -r requirements.txt
-```
+| Configuration | Accuracy | Overhead per Round |
+|--------------|----------|--------------------|
+| 3 Tenants | 99.86% | 0.94 KB |
+| 4 Tenants | 99.84% | 1.25 KB |
+| 5 Tenants | 99.82% | 1.56 KB |
 
-### 2. Run analysis notebook
-Open `notebooks/DDoS_Detection_Analysis.ipynb` in Jupyter Notebook and run all cells.
-
-### 3. Run federated learning
-Open four terminals and run:
-
-**Terminal 1 — Start server:**
-```bash
-python federated_learning/server.py
-```
-
-**Terminal 2 — Start Tenant 1:**
-```bash
-python federated_learning/client.py
-```
-
-**Terminal 3 — Start Tenant 2:**
-```bash
-python federated_learning/client.py
-```
-
-**Terminal 4 — Start Tenant 3:**
-```bash
-python federated_learning/client.py
-```
-
-## Author
+### Author
 Anna Mushi  
 MSc Cloud Computing  
 Munster Technological University Cork  
