@@ -1,1 +1,24 @@
 
+# Federated Learning Framework
+flwr==1.26.1  # Flower framework
+
+# Data Processing
+numpy==2.2.6
+pandas==2.3.3
+scikit-learn==1.7.2  # for preprocessing and metrics
+
+# Machine Learning
+xgboost==3.2.0
+scikit-learn==1.7.2  # for RandomForest, SVM, LogisticRegression
+
+# Explainability
+shap==0.49.1  # for SHAP feature importance analysis
+
+# Data Visualization
+matplotlib==3.10.8
+seaborn==0.13.2
+
+# Jupyter Environment
+jupyter>=1.0.0
+notebook>=6.4.0
+ipython>=7.24.0
