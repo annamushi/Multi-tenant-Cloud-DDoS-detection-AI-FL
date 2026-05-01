@@ -35,18 +35,9 @@ Dataset link: https://www.unb.ca/cic/datasets/ddos-2019.html
 | FL-DAD (CNN) | CICIDS2017 | 98.70% |
 | FedLAD (XGBoost) | CICDDoS2019 | 98.38% |
 
-## Requirements
-
-Python 3.10
-pandas==2.3.3
-numpy==2.2.6
-scikit-learn==1.7.2
-xgboost==3.2.0
-flwr==1.26.1
-shap==0.49.1
-matplotlib==3.10.8
 
 ## How to Run
+
 
 ### 1. Install dependencies
 ```bash
